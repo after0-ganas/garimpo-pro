@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111827"><meta name="description" content="Controle offline de garimpo e revenda de hardware usado.">
+<link rel="manifest" href="manifest.webmanifest">
+<title>Garimpo Pro</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1020;--panel:#141c2e;--panel2:#1b263b;--line:#2c3850;--text:#eef3ff;--muted:#9ba9c2;--green:#43d39e;--red:#ff7585;--blue:#7aa7ff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;padding-bottom:30px}
+header{padding:22px 17px 18px;background:linear-gradient(135deg,#17233c,#101625);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+.brand{display:flex;align-items:center;gap:11px}.logo{width:42px;height:42px;border-radius:13px;background:var(--green);color:#092018;display:grid;place-items:center;font-weight:900;font-size:20px}
+h1{font-size:22px;margin:0;letter-spacing:-.5px}header p{margin:3px 0 0;color:var(--muted);font-size:12px}
+main{max-width:850px;margin:auto;padding:15px;display:grid;gap:15px}.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.stat,.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px;min-width:0}.stat span{color:var(--muted);font-size:12px;display:block}.stat strong{display:block;font-size:19px;margin-top:5px;overflow-wrap:anywhere}.positive{color:var(--green)}.negative{color:var(--red)}
+h2{font-size:17px;margin:0 0 12px}h3{font-size:15px;margin:0}label{display:block;color:var(--muted);font-size:12px;margin:0 0 5px}input,select,textarea{width:100%;background:#0e1525;color:var(--text);border:1px solid #35425c;border-radius:10px;padding:11px;font:inherit;min-width:0}input:focus,select:focus,textarea:focus{outline:2px solid #7aa7ff;border-color:transparent}.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.full{grid-column:1/-1}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}
+button,.filebtn{border:0;border-radius:10px;padding:11px 14px;font:600 14px system-ui;cursor:pointer;background:var(--green);color:#082016}.secondary{background:var(--panel2);color:var(--text);border:1px solid var(--line)}.danger{background:#482432;color:#ffd9de}.small{font-size:12px;padding:7px 10px}.muted{color:var(--muted)}.toolbar{display:flex;gap:8px;flex-wrap:wrap}.toolbar input{flex:1;min-width:130px}.tabs{display:flex;gap:7px;overflow:auto;margin-bottom:12px}.tab{white-space:nowrap}.tab.active{background:var(--green);color:#082016}
+.item{padding:13px 0;border-top:1px solid var(--line);display:grid;gap:8px}.item:first-child{border-top:0}.itemtop{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.itemtitle{font-weight:700}.pill{display:inline-block;border:1px solid var(--line);border-radius:99px;padding:3px 8px;font-size:11px;color:var(--muted);margin-top:5px}.itemmeta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;color:var(--muted);font-size:12px}.itemmeta b{color:var(--text);font-weight:600}.itemactions{display:flex;gap:6px;flex-wrap:wrap}.empty{text-align:center;padding:22px;color:var(--muted)}.progress{height:9px;background:#273149;border-radius:99px;overflow:hidden;margin:10px 0}.progress div{height:100%;background:var(--green);width:0%}.notice{font-size:12px;color:var(--muted);margin-top:9px}.hidden{display:none!important}
+@media(min-width:650px){.stats{grid-template-columns:repeat(4,minmax(0,1fr))}.stat strong{font-size:21px}.fields{grid-template-columns:repeat(3,minmax(0,1fr))}}
+</style>
+</head>
+<body>
+<header><div class="brand"><div class="logo">GP</div><div><h1>Garimpo Pro</h1><p>Garimpe com método. Revenda com lucro.</p></div></div></header>
+<main>
+<section class="stats">
+<div class="stat"><span>Capital em estoque</span><strong id="capital">R$ 0,00</strong></div>
+<div class="stat"><span>Dinheiro recuperado*</span><strong id="recovered">R$ 0,00</strong></div>
+<div class="stat"><span>Lucro acumulado</span><strong id="profit">R$ 0,00</strong></div>
+<div class="stat"><span>Peças em estoque</span><strong id="stockCount">0</strong></div>
+</section>
+<section class="panel">
+<h2 id="formTitle">＋ Registrar peça</h2>
+<form id="productForm">
+<input type="hidden" id="editId">
+<div class="fields">
+<div><label for="product">Produto / peça *</label><input id="product" required placeholder="Ex.: placa de vídeo"></div>
+<div><label for="brand">Marca</label><input id="brand" placeholder="Ex.: XFX"></div>
+<div><label for="model">Modelo</label><input id="model" placeholder="Ex.: RX 6700"></div>
+<div><label for="condition">Estado</label><select id="condition"><option>Funcionando</option><option>Usado - bom</option><option>Com defeito</option><option>Para peças</option><option>Reparado</option><option>Outro</option></select></div>
+<div><label for="status">Situação</label><select id="status"><option value="stock">Em estoque</option><option value="sold">Vendido</option></select></div>
+<div><label for="buyDate">Data da compra *</label><input id="buyDate" type="date" required></div>
+<div><label for="buy">Preço de compra (R$) *</label><input id="buy" type="number" min="0" step=".01" required placeholder="0,00"></div>
+<div><label for="fee">Taxas da OLX (R$)</label><input id="fee" type="number" min="0" step=".01" value="0"></div>
+<div><label for="shipping">Frete (R$)</label><input id="shipping" type="number" min="0" step=".01" value="0"></div>
+<div><label for="repair">Reparos (R$)</label><input id="repair" type="number" min="0" step=".01" value="0"></div>
+<div><label for="other">Outros custos (R$)</label><input id="other" type="number" min="0" step=".01" value="0"></div>
+<div><label for="estimate">Venda estimada (R$)</label><input id="estimate" type="number" min="0" step=".01" placeholder="0,00"></div>
+<div><label for="sale">Venda real (R$)</label><input id="sale" type="number" min="0" step=".01" placeholder="Preencha ao vender"></div>
+<div><label for="saleDate">Data da venda</label><input id="saleDate" type="date"></div>
+<div class="full"><label for="notes">Observações</label><textarea id="notes" rows="2" placeholder="Defeitos, acessórios, teste realizado..."></textarea></div>
+</div>
+<div class="notice" id="liveCalc">Custo total: R$ 0,00 · Lucro estimado: R$ 0,00</div>
+<div class="actions"><button type="submit" id="saveBtn">Salvar peça</button><button type="button" class="secondary hidden" id="cancelEdit">Cancelar edição</button><button type="button" class="secondary" id="clearForm">Limpar formulário</button></div>
+<p class="notice">* O custo total inclui compra, taxas, frete, reparos e outros custos. Informe taxas e custos em reais.</p>
+</form>
+</section>
+<section class="panel">
+<h2>Meta mensal de lucro</h2>
+<div class="fields"><div><label for="goalMonth">Mês da meta</label><input type="month" id="goalMonth"></div><div><label for="goal">Meta de lucro (R$)</label><input type="number" id="goal" min="0" step=".01" placeholder="Ex.: 1500"></div></div>
+<div class="progress"><div id="goalBar"></div></div><div id="goalText" class="muted">Defina uma meta para acompanhar o progresso.</div>
+<div class="notice">A meta considera o lucro líquido das peças vendidas no mês selecionado.</div>
+</section>
+<section class="panel">
+<h2>Peças e histórico</h2>
+<div class="tabs"><button class="tab active secondary" data-filter="all">Todas</button><button class="tab secondary" data-filter="stock">Em estoque</button><button class="tab secondary" data-filter="sold">Vendidas</button></div>
+<div class="toolbar"><input id="search" placeholder="Buscar peça, marca ou modelo"><select id="sort" style="max-width:155px"><option value="new">Mais recentes</option><option value="old">Mais antigas</option><option value="profit">Maior lucro</option><option value="cost">Maior custo</option></select></div>
+<div id="list"></div>
+</section>
+<section class="panel">
+<h2>Backup e dados</h2>
+<p class="muted">Seus registros ficam neste navegador e funcionam offline depois que o app for instalado/carregado. Exporte um backup regularmente, especialmente antes de limpar os dados do navegador ou trocar de celular.</p>
+<div class="actions"><button id="exportBtn">Exportar backup (.json)</button><label class="filebtn secondary" for="importFile">Restaurar backup</label><input class="hidden" type="file" id="importFile" accept="application/json,.json"><button class="secondary" id="installBtn" style="display:none">Instalar app</button></div>
+<p class="notice">Não use “Limpar dados” do navegador sem antes exportar. O backup inclui peças e meta mensal.</p>
+</section>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const KEY='garimpoPro_v1';
+let items=[], filter='all', deferredPrompt=null;
+const money=n=>Number(n||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const num=id=>Math.max(0,Number($(id).value)||0);
+const today=()=>new Date().toISOString().slice(0,10);
+const monthNow=()=>today().slice(0,7);
+const cost=x=>+x.buy+ +x.fee+ +x.shipping+ +x.repair+ +x.other;
+const net=x=>Math.max(0,+x.sale||0)-cost(x);
+const days=x=>{if(!x.buyDate)return '—';let end=x.status==='sold'&&x.saleDate?x.saleDate:today();return Math.max(0,Math.floor((new Date(end+'T12:00:00')-new Date(x.buyDate+'T12:00:00'))/86400000))};
+function load(){try{const d=JSON.parse(localStorage.getItem(KEY)||'{}');items=Array.isArray(d.items)?d.items:[];$('goal').value=d.goal??'';$('goalMonth').value=d.goalMonth||monthNow()}catch(e){items=[];$('goalMonth').value=monthNow()}}
+function persist(){localStorage.setItem(KEY,JSON.stringify({version:1,items,goal:$('goal').value,goalMonth:$('goalMonth').value}));render()}
+function resetForm(){ $('productForm').reset();$('editId').value='';$('buyDate').value=today();['fee','shipping','repair','other'].forEach(id=>$(id).value='0');$('status').value='stock';$('formTitle').textContent='＋ Registrar peça';$('saveBtn').textContent='Salvar peça';$('cancelEdit').classList.add('hidden');calcPreview()}
+function readForm(){return {product:$('product').value.trim(),brand:$('brand').value.trim(),model:$('model').value.trim(),condition:$('condition').value,status:$('status').value,buyDate:$('buyDate').value,buy:num('buy'),fee:num('fee'),shipping:num('shipping'),repair:num('repair'),other:num('other'),estimate:num('estimate'),sale:num('sale'),saleDate:$('saleDate').value,notes:$('notes').value.trim()}}
+$('productForm').addEventListener('submit',e=>{e.preventDefault();const data=readForm(),id=$('editId').value;if(data.status==='sold'&&(!data.saleDate||data.sale<=0)){alert('Para marcar como vendido, informe a venda real e a data da venda.');return}if(data.status==='stock'){data.sale=0;data.saleDate=''}if(id){items=items.map(x=>x.id===id?{...x,...data}:x)}else items.unshift({id:crypto.randomUUID?crypto.randomUUID():String(Date.now()),...data,createdAt:new Date().toISOString()});persist();resetForm();});
+$('cancelEdit').onclick=resetForm;$('clearForm').onclick=resetForm;
+function edit(id){const x=items.find(x=>x.id===id);if(!x)return;Object.keys(x).forEach(k=>{const el=$(k);if(el)el.value=x[k]??''});$('editId').value=id;$('formTitle').textContent='✎ Editar peça';$('saveBtn').textContent='Salvar alterações';$('cancelEdit').classList.remove('hidden');window.scrollTo({top:0,behavior:'smooth'});calcPreview()}
+function del(id){const x=items.find(x=>x.id===id);if(x&&confirm(`Excluir "${x.product}"? Essa ação não pode ser desfeita. Exporte um backup antes, se necessário.`)){items=items.filter(i=>i.id!==id);persist();if($('editId').value===id)resetForm()}}
+function render(){const stock=items.filter(x=>x.status==='stock'),sold=items.filter(x=>x.status==='sold');const capital=stock.reduce((s,x)=>s+cost(x),0),recovered=sold.reduce((s,x)=>s+(+x.sale||0),0),profit=sold.reduce((s,x)=>s+net(x),0);
+$('capital').textContent=money(capital);$('recovered').textContent=money(recovered);$('profit').textContent=money(profit);$('profit').className=profit>=0?'positive':'negative';$('stockCount').textContent=stock.length;
+const month=$('goalMonth').value||monthNow(),goal=Number($('goal').value)||0,mp=sold.filter(x=>(x.saleDate||'').slice(0,7)===month).reduce((s,x)=>s+net(x),0),pct=goal>0?Math.min(100,Math.max(0,mp/goal*100)):0;
+$('goalBar').style.width=pct+'%';$('goalText').textContent=goal>0?`${money(mp)} de ${money(goal)} (${pct.toFixed(0)}%)${mp>=goal?' · Meta atingida!':''}`:`Lucro no mês: ${money(mp)}. Defina uma meta acima de zero.`;
+let arr=items.filter(x=>filter==='all'||x.status===filter),q=$('search').value.toLowerCase();arr=arr.filter(x=>[x.product,x.brand,x.model,x.condition,x.notes].join(' ').toLowerCase().includes(q));const sort=$('sort').value;arr.sort((a,b)=>sort==='old'?(a.buyDate||'').localeCompare(b.buyDate||''):sort==='profit'?net(b)-net(a):sort==='cost'?cost(b)-cost(a):(b.createdAt||b.buyDate||'').localeCompare(a.createdAt||a.buyDate||''));
+$('list').innerHTML=arr.length?arr.map(x=>{const c=cost(x),p=net(x),sold=x.status==='sold';return `<article class="item"><div class="itemtop"><div><div class="itemtitle">${esc(x.product)}${x.brand?' · '+esc(x.brand):''}</div><div class="muted">${esc(x.model||'Modelo não informado')}</div><span class="pill">${sold?'VENDIDO':'EM ESTOQUE'} · ${esc(x.condition)}</span></div><div style="text-align:right"><strong class="${sold?(p>=0?'positive':'negative'):''}">${sold?money(p):money(c)}</strong><div class="muted" style="font-size:11px">${sold?'lucro líquido':'custo total'}</div></div></div><div class="itemmeta"><div>Compra: <b>${money(x.buy)}</b></div><div>Custo total: <b>${money(c)}</b></div><div>${sold?'Venda real':'Venda estimada'}: <b>${money(sold?x.sale:x.estimate)}</b></div><div>Tempo em estoque: <b>${days(x)} dia(s)</b></div>${sold?`<div>Margem: <b>${x.sale>0?(p/x.sale*100).toFixed(1):'0,0'}%</b></div><div>ROI: <b>${c>0?(p/c*100).toFixed(1):'0,0'}%</b></div>`:`<div>Lucro estimado: <b>${money(x.estimate-c)}</b></div>`}<div>Data compra: <b>${esc(x.buyDate||'—')}</b></div>${sold?`<div>Data venda: <b>${esc(x.saleDate||'—')}</b></div>`:''}</div>${x.notes?`<div class="muted" style="font-size:12px">${esc(x.notes)}</div>`:''}<div class="itemactions"><button class="secondary small" onclick="edit('${x.id}')">Editar</button><button class="danger small" onclick="del('${x.id}')">Excluir</button></div></article>`}).join(''):'<div class="empty">Nenhuma peça encontrada. Registre sua primeira compra acima.</div>';
+}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function calcPreview(){const c=num('buy')+num('fee')+num('shipping')+num('repair')+num('other');const v=num('estimate');$('liveCalc').textContent=`Custo total: ${money(c)} · Lucro estimado: ${money(v-c)} · Margem estimada: ${v>0?((v-c)/v*100).toFixed(1):'0,0'}%` }
+['buy','fee','shipping','repair','other','estimate'].forEach(id=>$(id).addEventListener('input',calcPreview));
+document.querySelectorAll('[data-filter]').forEach(b=>b.onclick=()=>{filter=b.dataset.filter;document.querySelectorAll('[data-filter]').forEach(t=>t.classList.toggle('active',t===b));render()});
+$('search').oninput=render;$('sort').onchange=render;$('goal').oninput=persist;$('goalMonth').onchange=persist;
+$('exportBtn').onclick=()=>{const blob=new Blob([JSON.stringify({app:'Garimpo Pro',version:1,exportedAt:new Date().toISOString(),items,goal:$('goal').value,goalMonth:$('goalMonth').value},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='garimpo-pro-backup-'+today()+'.json';a.click();URL.revokeObjectURL(a.href)};
+$('importFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const d=JSON.parse(await f.text());if(!d||!Array.isArray(d.items))throw Error('Formato inválido');if(!confirm(`Restaurar ${d.items.length} registro(s)? Isso substituirá os dados atuais. Exporte os dados atuais antes, se quiser preservá-los.`))return;items=d.items.map(x=>({...x,id:String(x.id||Date.now()+Math.random())}));$('goal').value=d.goal??'';$('goalMonth').value=d.goalMonth||monthNow();persist();alert('Backup restaurado.');}catch(err){alert('Não foi possível restaurar esse arquivo. Escolha um backup Garimpo Pro válido.')}finally{e.target.value=''}};
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;$('installBtn').style.display='inline-block'});$('installBtn').onclick=async()=>{if(deferredPrompt){deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;$('installBtn').style.display='none'}else alert('No Chrome para Android, abra o menu ⋮ e escolha “Instalar app” ou “Adicionar à tela inicial”.')};
+if('serviceWorker' in navigator && location.protocol.startsWith('http'))window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+load();$('buyDate').value=today();resetForm();render();
+</script>
+</body></html>
